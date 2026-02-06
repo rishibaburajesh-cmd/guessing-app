@@ -81,8 +81,16 @@ class StorageService {
     }
 }
 
+class GameControler {
+    public static boolean restartGame(Scanner scanner) {
+        System.out.println("Do you want to play once again? (Yes/No) :");
+        return scanner.nextLine().equalsIgnoreCase("Yes");
+    }
+}
+
 class GuessingApp {
     public static void main(String[] args) throws InvalidInputException {
+        boolean restart;
         System.out.println("=======================================");
         System.out.println("Welcome to the Guessing App");
         System.out.println("=======================================");
@@ -90,29 +98,32 @@ class GuessingApp {
         GameConfig gameConfig = new GameConfig();
         gameConfig.showRules();
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter Player Name: ");
-        String player = scanner.nextLine();
-        int attempts = 0;
-        boolean win = false;
+        do {
+            System.out.println("Enter Player Name: ");
+            String player = scanner.nextLine();
+            int attempts = 0;
+            boolean win = false;
 
-        while (attempts < gameConfig.getMaxAttempts()) {
-            System.out.println("Enter your guess : ");
-            int guess = ValidationService.validateInput(scanner.nextLine());
-            attempts++;
+            while (attempts < gameConfig.getMaxAttempts()) {
+                System.out.println("Enter your guess : ");
+                int guess = ValidationService.validateInput(scanner.nextLine());
+                attempts++;
 
-            if (attempts <= 3) {
-                String hint = HintService.generateHint(gameConfig.getTargetNumber(), attempts);
-                System.out.println(hint);
+                if (attempts <= 3) {
+                    String hint = HintService.generateHint(gameConfig.getTargetNumber(), attempts);
+                    System.out.println(hint);
+                }
+
+                String result = GuessValidator.validateGuess(guess, gameConfig.getTargetNumber());
+                System.out.println(result);
+
+                if ("CORRECT".equals(result)) {
+                    win = true;
+                    break;
+                }
             }
-
-            String result = GuessValidator.validateGuess(guess, gameConfig.getTargetNumber());
-            System.out.println(result);
-
-            if ("CORRECT".equals(result)) {
-                win = true;
-                break;
-            }
-        }
-        StorageService.saveResult(player, attempts, win);
+            StorageService.saveResult(player, attempts, win);
+            restart = GameControler.restartGame(scanner);
+        } while(restart);
     }
 }
