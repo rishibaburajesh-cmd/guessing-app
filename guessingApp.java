@@ -47,8 +47,28 @@ class HintService {
     }
 }
 
+class InvalidInputException extends Exception {
+    public InvalidInputException(String message) {
+        super(message);
+    }
+}
+
+class ValidationService {
+    public static int validateInput(String input) throws InvalidInputException {
+        try {
+            int value = Integer.parseInt(input);
+            if (value < 1 || value > 100) {
+                throw new InvalidInputException("Number must be between 1 and 100");
+            }
+            return value;
+        } catch (NumberFormatException e) {
+            throw new InvalidInputException("Invalid input. Please enter numbers only");
+        }
+    }
+}
+
 class GuessingApp {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidInputException {
         System.out.println("Welcome to the Guessing App");
         GameConfig gameConfig = new GameConfig();
         gameConfig.showRules();
@@ -57,7 +77,7 @@ class GuessingApp {
 
         while (attempts < gameConfig.getMaxAttempts()) {
             System.out.println("Enter your guess : ");
-            int guess = scanner.nextInt();
+            int guess = ValidationService.validateInput(scanner.nextLine());
             attempts++;
 
             if (attempts <= 3) {
