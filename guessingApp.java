@@ -35,6 +35,18 @@ class GuessValidator {
     }
 }
 
+class HintService {
+    public static String generateHint(int target, int hintCount) {
+        if (hintCount == 1) {
+            return (target % 2 == 0) ? "Hint: Number is EVEN" : "Hint: Number is ODD";
+        } else if (hintCount == 2) {
+            return (target > 50) ? "Hint: Number is greater than 50" : "Hint: Number is 50 or less";
+        }
+
+        return "No more hints available";
+    }
+}
+
 class GuessingApp {
     public static void main(String[] args) {
         System.out.println("Welcome to the Guessing App");
@@ -47,6 +59,11 @@ class GuessingApp {
             System.out.println("Enter your guess : ");
             int guess = scanner.nextInt();
             attempts++;
+
+            if (attempts <= 3) {
+                String hint = HintService.generateHint(gameConfig.getTargetNumber(), attempts);
+                System.out.println(hint);
+            }
 
             String result = GuessValidator.validateGuess(guess, gameConfig.getTargetNumber());
             System.out.println(result);
