@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -67,13 +70,30 @@ class ValidationService {
     }
 }
 
+class StorageService {
+    public static void saveResult(String player, int attempt, boolean win) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("game_results.txt", true))) {
+            writer.write("Player: " + player + ", Attempts: " + attempt + ", Result: " + (win ? "WIN" : "LOSE"));
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Unable to save game result.");
+        }
+    }
+}
+
 class GuessingApp {
     public static void main(String[] args) throws InvalidInputException {
+        System.out.println("=======================================");
         System.out.println("Welcome to the Guessing App");
+        System.out.println("=======================================");
+
         GameConfig gameConfig = new GameConfig();
         gameConfig.showRules();
         Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter Player Name: ");
+        String player = scanner.nextLine();
         int attempts = 0;
+        boolean win = false;
 
         while (attempts < gameConfig.getMaxAttempts()) {
             System.out.println("Enter your guess : ");
@@ -89,8 +109,10 @@ class GuessingApp {
             System.out.println(result);
 
             if ("CORRECT".equals(result)) {
+                win = true;
                 break;
             }
         }
+        StorageService.saveResult(player, attempts, win);
     }
 }
